@@ -1,0 +1,328 @@
+takes tensors of shape: (samples,time,features) --- 3D tensors
+outputs 2D tensors of shape: 
+
+
+
+# IMPORTANT: Different kinds of Networks
+# (1) Sequential Model - Input - Stacks of Layers - Output
+# (2) Some Input networks require several independent inputs
+# (3) others require multiple outputs
+# (4) Other Networks have internal branching of layers which make them look like graphs
+#     rather than linear stacks of layers
+
+# Muti Modal tasks:
+# Merge data from different Input Sources
+# Processing each type of data using different kinds of neural layers
+
+# Used case: Predicting price using data from
+# (1) Text: Customer Comments etc
+# (2) Specific User Demographics - this will be the structured data
+# (3) Pictures
+
+# naive approach to solve the problem will be to ensemble the RNN, CNN and NN model together
+# Sophisticated Approach: "Jointly" Learn all of the 3 info. together
+
+# (Dense Model, RNN Model, CONV Model) ---> Merging Module ---> Price Prediction
+
+# Used Case: Based on the Text of a Novel predict the (1) The Genre and (2) The date when it was written.
+# Both (1) and (2) being statistically not independent
+# (Text-Processing Module) ---> Genre Classifier ---> Genre 
+#			   ---> Date Classifier  ---> Date
+# due to correlation between date and genre, the space of the model will be able to learn rich, accurate representations of the space of 
+# novel genres and vice versa.
+
+# several of the many recently developed neural architectures require non linear network topology: networks structured as directed acylic
+# graphs. 
+# For example, Inception
+# Also Resnet where we reinject previous representations into the downstream flow of data by adding a past tensor to a later output tensor
+# which prevents information loss during data-processing flow.
+
+# a double input model example
+
+# a typical question and answer model has 2 inputs providing a quetion and also
+# a text snippet from which we need to find the answers from
+# the final output will be a softmax output answers on the answer vocabulary
+
+# how do we train such a model
+# (1) you can feed the model a list of Numpy arrays as inputs 
+# or
+# (2) you can feed it a dictionary that maps input names to Numpy arrays
+
+# Multi output model where the output is series of things which are correlated
+# also called the Multi Headed model
+# for example a Network that takes a series of posts from the twitter and predicts
+# demographics of the person - age, gender, income level etc
+
+#Importantly, training such a model requires the ability to specify different 
+#loss functions for different heads of the network
+
+#Importantly, training such a model requires the ability to specify different 
+#loss functions for different heads of the network
+
+# defining or combining all of the losses to help GD in going with one scaler of loss
+# Note that very imbalanced loss contributions will cause the model representations
+# to be optimized in favour of the largest individual loss.
+# to remedy this we can assign different values of importance to the loss values
+# in contribution to the final loss
+
+# For instance, the mean squared error ( MSE ) loss
+# used for the age-regression task typically takes a value around 3–5, 
+# whereas the cross-entropy loss used for the gender-classification task 
+# can be as low as 0.1. In such a situa-tion, to balance the contribution 
+# of the different losses, you can assign a weight of 10 to the crossentropy loss 
+# and a weight of 0.25 to the MSE loss.
+
+# --- Models with complex internal topology
+# they are also called Directed Acylic Layers of Graphs
+# examples of such modules are Inception Modules and Residual Modules
+# the most basic form of Insception Module consists of 3 or 4 branches starting with a 1*1 convolution followed by 3*3 convolutions
+# ending with a concatenation of resulting features. Inception Module was inspired by Network in Network Architecture.
+# this network helps learn spatial features and channel-wise features separately ... this is more efficient than learning them
+# jointly.
+
+# --- case for branch like or Inception like architectures
+# case for 1*1 convolution as opposed to 3*3 etc convolutions. 1*1 becomes just a dense operation across different channels.
+# it will compute features that mix information from the channels of the input tensor but it will not mix information across space.
+# So when used in Inception Module it is combines channel wise feature learning with space wise feature learning.
+# each channel can be highly autocorrelated across space but different channels may not be correlated with each other.
+
+
+# --- case for Residual Architectures
+# each successive representional layer is based on the information passed on by the previous layer. This means there are 
+# constraints to it's learning.
+# compare with signal processing analogy. Also Residuals work in the same way as the Carry Track of an LSTM.
+# Residuals prevent Vanishing Gradient Problem.
+
+# --- Layer Weight Sharing
+# Used case: predict whether 2 sentences have the same semantic meaning or not. 
+# solution: create a left model and a right model with the same architecture.
+# concatenate both of these models as axis = -1
+# and then model = Model([left_output,right_output], predictions) and
+# model.fit([left_data,right_data],targets)
+# this is also called the Siamese LSTM
+
+# models as layers
+# the only catch here is 
+# (1) Not using the top most layer 
+# (2) You are not doing something like a transfer learning. The model here behaves entirely like a layer. A layer with all the weights
+#     intact. No changes whatsoever
+
+# ----------- inspecting and monitoring DL models using Keras Callbacks and Tensor Board
+# this is all in the realm of Training and Validation ... do you get it?
+# launching a training run on a large dataset for 10's of epoch using model.fit() or model.fit_generator() [only 2 ways OK!!!] can be bit 
+# like launching a paper aeroplane ... past the initial impulse you have no control over it's trajectory or it's landing spot.
+# Using a drone instead of an aeroplane will help. Send signals back testing the environment and landing or obtaining the objective
+# the idea is to come up with techniques which converts the paper plane to a drone: send signals back and even making the right decisions
+# to land on the right place or even achieving the right objective.
+
+# remember the training versus validation graphs that gets you the right number of epochs
+# this section is about interveing this process via the method of Call Backs
+
+# !!! stop the training when the validation loss is not improving ... via the use of Call Backs
+
+# --- What is a Call Back
+# Call Back is a specific object that is passed to the model in the CALL TO FIT and is CALLED by the model at various points during training
+# It has access to 
+#	(1) All available data about the state of the model 
+#	(2) it's Performance
+#	(3) And has the ability to take action: 
+# 		(1) Interrupt Training
+#		(2) Save the Model 
+#		(3) Load a different weight set
+#		(4) Alter the state of the model.
+
+# --- ways to use Call Backs
+# 		(1) Model Checkpointing: Saving the weights of the model at different points during training
+#		(2) Early Stopping: Interupping training when the validation loss is no longer improving
+#		    (this includes saving the best model during training)
+#		(3) Dynamically Adjusting the value of certain parameters during Training: such as the learning rate parameter of the 
+#		    Optimizer
+#		(4) Logging Training and Validation Metrics during training, or visualizing the representations learned by the model 
+#		    as they are updated: Keras Progress bar
+
+# Examples:
+#	keras.callbacks.ModelCheckpoint
+#	keras.callbacks.EarlyStopping
+#	keras.callbacks.LearningRateScheduler
+#	keras.callbacks.ReduceLROnPlateau
+#	keras.callbacks.CSVLogger
+
+# keras.callbacks.EarlyStopping: identifies the point(interrupt) where the model starts overfitting. saves you the time for re-training the    # model again for fewer number of epochs
+
+# keras.callbacks.EarlyStopping is typically used along with keras.callbacks.ModelCheckpoint which lets you continually save the model during
+# training. And optionally save the current best model ... the version of the model that had shown the best performance at the end of an epoch.
+
+# -------------------------------------------- an example ----------- START
+#import keras
+#
+#callbacks_list = [
+#        keras.callbacks.EarlyStopping( # interrupts when train improvemnt stops
+#                monitor = 'acc', # uses model accuracy for decision making
+#                patience = 1), # to make decision wait until you are more than
+#                # 1 epochs. so no improvements since 2 epochs loose patience
+#                # make a decision
+#        keras.callbacks.ModelCheckpoint( # saves the current weights after every 
+#                                         # every epoch
+#                                         filepath='my_model.h5',
+#                                         monitor='val_loss',
+#                                         save_best_only=True,
+## the last 2 steps mean you will not overwrite the model unless the val_loss 
+## loss have improved. This allows you to keep the best model during Training
+#                )
+#        ]
+#
+#model.compile(optimizer='rmsprop',
+#            loss='binary_crossentropy',
+#            metrics=['acc']) # you monitor model accuracy so that it can be a part
+## of the model metrics
+#
+#model.fit(x, y,
+#            epochs=10,
+#            batch_size=32,
+#            callbacks=callbacks_list,
+#            validation_data=(x_val, y_val))
+
+# -------------------------------------------- an example ----------- END
+
+# the REDUCELRONPLATEAU Call back
+# reducing or increasing the LR in case of a loss plateau is an effective means of getting out of Local Minima during training
+
+# -------------------------------------------- an example ----------- START
+
+#callbacks_list = [
+#        keras.callbacks.ReduceLROnPlateau(
+#                monitor='val_loss',
+#                factor=0.1,
+#                patience=10,)
+#        ]
+#
+#model.fit(x,y, 
+#          epochs=10,
+#          batch_size=32,
+#          callbacks= callbacks_list,
+#          validation_data= (x_val,y_val))
+
+# -------------------------------------------- an example ----------- END
+
+# tensor board visualization framework
+
+#	(1) Visualizing Monitoring Metrics during training
+#	(2) Visualizing Model Architecture
+#	(3) Visualizing Histograms of Activations and Gradients
+#	(4) Exploring Embeddings in 3D
+
+# Tensorboard can be useful for visualization. I faced some problem in visualization of Word Embeddings.
+# Keras can also be used for visualization. The requirement being the packages pydot and pydot-ng should be already installed.
+# Below are the codes for it:
+# from keras.utils import plot_model
+# plot_model(model, to_file='model.png')
+# from keras.utils import plot_model
+# plot_model(model, show_shapes=True, to_file='model.png')
+
+# --- Architecture Patterns which is the winning factor in Competitions
+# (1) Residual Connections
+# (2) Batch Normalizations
+# (3) Deptwise Separable Convolutions.
+
+# --- What is Normalizations and the case for Batch Normalizations?
+# Normalizations is a broad category of methods which makes the ML learn and generalize well in new data.
+# the most common among these is the one which centers the data on 0 by substracting the mean from the data and giving the data unit 
+# SD by dividing the data with respective SD's.
+# In effect this makes the assumption that the data follows a Gaussian Distribution
+# the FACT OF THE MATTER IS NORMALIZATIONS SHOULD BE DONE AFTER EVERY TRANSFORMATION(THE LAYERS) EVEN IF THE DATA THAT ENTERED WAS NORMALIZED
+
+# Batch Normalization is a type of layer that adaptively normalize the data even when the mean and variance change overtime during training
+# it works internally by maintaining an exponential Moving Average of the Batch Wise mean and Variance of the data seen during training.
+# THE MAIN EFFECT of Batch Normalization is that it effectively helps in Gradient Propagation like Residual Connections and thus ALLOWS
+# FOR DEEPER NN.
+
+# For example, Batch Normalization is used very liberally for some of the advanced architecture in Image such as ResNet50, Inception V3 and 
+# Xception
+
+# BN IS TYPICALLY USED AFTER A CONVOLUTION AND DENSELY CONNECTED LAYER
+
+# --- Examples of code with Batch Normalization
+# conv_model.add(layers.Conv2D(32, 3, activation='relu'))
+# conv_model.add(layers.BatchNormalization())
+
+# dense_model.add(layers.Dense(32, activation='relu'))
+# dense_model.add(layers.BatchNormalization())
+
+# advancedment on Batch Normalizations:
+# self normalizaiton NNs
+# lecun_normal
+
+# --- Deptwise Separable Convolutions
+# is the basis of Xception a high performing CONVET architecture. What else? Not quite sure I understand it properly from then Book itself
+# 
+
+
+# --- Hyperparameter Optimizations
+# (1) How many layers should you stack?
+# (2) How many units or Filters should go into each layer?
+# (3) Should you use RELU or any other Activation Function?
+# (4) Should you use Batch Normalization after certain layer(s)?
+# (5) How much drop out should you use?
+# 						All of these parameters are known as Hyperparameters to distinguih them from the parameters 
+# that get trained during Model Training.
+
+
+# --- Process of choosing Hyperparameters:
+#	(1) Choose a set of Hyperparameters
+#	(2) Build the corresponding Model
+#	(3) Fit it to your training data and measure the final performance on the Validation Data
+#	(4) Choose the next set of Parameters to try
+#	(5) Repeat
+#	(6) Eventually, measure performance on the test data.
+
+# Different techniques to come up with the best hyperparameters:
+#	(1) Bayesian Optimization
+#	(2) Genetic Algorithms
+#	(3) Simple Random Search
+
+# Important tool for Hyperparamter finding
+# But one tool I have found reliably better than random search is Hyperopt (https://github.com/hyperopt/hyperopt)
+# a Python library for hyperparameter optimization that internally uses trees of Parzen estimators
+# to predict sets of hyperparameters that are likely to work well
+# Another important Tool:
+# Another library called Hyperas (https://github.com/maxpumperla/hyperas) integrates Hyperopt for use
+# with Keras models.
+
+# Robustness of Validation data:
+# You are updating your hyperparameters based on the signal you recieve from the Validation data. This is the case of information leakage
+# as well. Always remember that.
+# Updating hyperparameters meaning not machine but human. Like you check the loss and acc graphs and making a call on the #epochs etc.
+
+# --- Model ensembling
+# Each model knows a part of the truth but not the complete truth. 
+# Imagine the ancient parable of blind men and the elephant.
+
+# --- simplest way to Ensemble
+# Average the predictions for all of the models
+# This will work only if the classifiers are more or less equally good.
+
+# ---- Smarter way to Ensemble
+# Weighted Average - best classifiers are given higher weightage and less good classifiers are given lower weightage
+# How do you find these weights ? --- this needs to be researched by you!!!
+# simple weighted average provides a baseline model. From this we can improve further.
+
+# --- best way to ensemble
+# Models should be as good as possible and as different as possible
+# This typically means the models should have as different architectures as possible
+
+# --- one best practice from experience
+# Ensemble of Tree based methods such as RF, GB and NN models
+
+# --- another best practice from experience
+# Combining DL Models with shallow learning models.
+
+
+
+
+
+
+
+
+# remember: global average pooling is also used prior to Dense
+
+
