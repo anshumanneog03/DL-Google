@@ -1,0 +1,274 @@
+
+############### ------------- Linear Regression and Basics
+# weak learners have low variance and high bias
+# histograms are special kind of bar plots that plots data by splitting them into intervals
+# regularization is a method to contain overfitting
+# a large cf value in a LR means a lot of emphasis have been given to that feature
+# --- full rank matrix and it's importance
+# if a matrix is full rank that it is intertible
+# if a matrix is full rank then there is no interdepence of rows and columns
+# even if x1 is significant it does not necessarily mean that the residuals will pass the normality test
+# making transformations improve the r-sq but not the standard error. May not impact the p-value of the feature as well
+# if two features x1 and x2 are individually significant to y. then joint model (x1, x2) is significant but x1 is not or x2 is not
+# Transformations are performed solely for:
+#	(1) Normality
+#	(2) stabilize variance
+#	(3) To ensure Linearity.
+
+
+
+# when running a LR or Factor Analysis or PCA you will come across an error called Linear Algebra: Singular Matrix. What does it mean?
+# This means that X is not full rank and hence you cannot invert it.
+# The most obvious thing to do will be to reconstruct your matrix using PCA to ensure that it is full rank.
+
+# Ensemble: 
+# (1) works best when the models are most uncorrelated --- this is called stacking. For example, avg(p1[0]+p2[0]) - mean stacking
+#     conditional stacking - another select the best model. rely on it when it says >= 0.8 or <= 0.2(more certain)
+#     if value lies in between refer to the other models probabilities. get the mean stacking of all the models
+# (2) When each model captures a different aspect of the data
+
+# --- best way to ensemble
+# Models should be as good as possible and as different as possible
+# This typically means the models should have as different architectures as possible
+
+# As compared to Bagging, Boosting algorithm takes care of Variance as well as Bias. Bagging is not quite able to take care of Bias. 
+
+# --- Parameter Tuning in xgBoost
+# there are 3 kinds of parameters in Boosting:
+#	(1) Tree Specific - that define each tree, the uniformity on all trees
+#	(2) Boosting - affects the Boosting operations in the model
+#	(3) Misc. Parameters - other parameters for overall functioning.
+
+# --- Tree specific Parameters:
+#	(1) min_samples_split: - minimum number of samples required in a node to consider a next split
+#			       - causes overfitting if the value is too low
+#			       - causes underfitting if the value is too high
+#       (2) min_samples_leaf:  - minimum number of samples in the leaf or terminal node
+#			       - controls overfitting
+#			       - for IMABALNCED classes consider putting lower values for this. Becasue there will be very few regions
+#			       - where the 1's will be populated.
+#	(3) min_weight_fraction_leaf: - similar to min_samples_leaf. use only one of the two
+#	(4) max_dept: - maximum dept of each tree
+#		      - controls over-fitting. A deeper tree will learn all specifics for a sample
+#		      - should be tuned using CV
+#	(5) max_leaf_nodes: - maximum number of terminal nodes in a tree. This is related to the max_dept. A binary tree created of n dept
+#			      will create n^2 nodes
+#		            - if this parameter is given the model will ignore max_dept
+#	(6) max_features: - maximum number of features to be considered by taking each split
+#		          - thumb rule take sqrt(n). but check upto 30%40% of the features
+#			  - higher values will cause overfitting
+
+# --- Boosting Specific Parameters
+#	(1) learning_rate: - determines the impact of each tree in the final outcome. this controls the magnitude of change.
+#	                   - lower values is preferred. But this will take larger time to converge
+
+#	(2) n_estimators:  - the number of sequential trees to be modelled
+#			   - more on this below. NEED TO BE FOUND THROUGH CV WRT LR
+
+#	(3) sub_sample:	   - Fraction of observations to be selected for each tree. this is random sampling
+#			   - Values very close to 1 will make the model very robust by reducing variance
+#			   - the norm is .8
+
+# --- Misc. Parameters
+#	(1) loss: - refers to the loss function that you need to minimize
+#		  - can have different functions for classification and regression
+
+#	(2) init: - initialization of the output
+#		  - can be used if another model estimates is used as the initial estimates of the model
+
+#	(3) random_state: - random seed so that same random numbers are generated every time
+#		          - 
+
+#	(4) verbose: - type of output to be printed when the model fits. the different values can be:
+#													(1) 0; no output generated
+#													(2) 1: output generated for trees in
+#														certain intervals
+#													(3) >1: generate for all trees
+#	(5) warm_start: using this we can fit additional trees on the previous fits of the model.
+
+#	(6) presort:
+#			- selects whether to presort the data for faster splits
+#			- it makes selection automatically by default but it can be changed if needed
+
+# --- Approach to tune hyperparameters in GB
+# (1) Choose a relatively high LR. The default value of 0.1 works but somewhere between 0.05 and 0.2 has also worked fine
+# (2) Determine the optimum number of Trees for this LR. This should range between 40-70
+# (3) Tune the Tree-specific-parameters for the decided LR and decide number of Trees
+# (4) lower the LR and increase the estimators proportionately.
+
+# grid search CV: get the best grid based on average of all the r2 from all cross validations
+
+# Description of the approach to hyper parameter tuning
+# (1) Find out n_estimators for LR = .1
+# (2) max_dept and min_samples_split
+# (3) min_sample_split and min_samples_leaf
+# (4) max_features
+# (5) subsample
+
+############################ ----- END OF GB -------------
+
+# PitchPos3Max,PitchPos2Max,BrgTemp1Mean
+
+############################ ----- xgboost 
+XGBoost Advantage
+
+# 1. Regularization - also known as the regularized Boosting technique
+# 2. Parallel Processing - faster than GB. Supports implementation in Hadoop
+# 3. High Flexibility - allows users to define custom optimizable objectives and evaluation criteria
+# 4. Handle Missing values - has in built modules to handle missing values
+# 5. Tree Prunning - GB will stop splitting a node if it encounters negative loss. xgb splits upto max and then 
+#    start prunning the tree backwards. also if the first split is negative of -2 and then a postive +10: GB will stop
+#    xgb however goes all the way and computes loss as +8
+# 6. Cross Validation: xgb allows to run cross validaiton on each iteration of the boosting process and hence helps in 
+#    identifying optimum number of boosting iterations. This is unlike GB where we run a grid-search and only limited 
+#    values can be tested.
+# 7. Continue on the existing model: you can start training an xgb from the last iteration of the previous run
+
+
+# ------------ general approach for parameter tuning using xgb
+# (1) Choose a high learning rate. Generally 0.1 works fine but you can choose something like 0.05 or 0.3.
+#     Determine the optimal number of trees. xgb has a very important function called "cv". This performs CV at each boosting iteration
+#     and returns the optimal number of trees required.
+# (2) Tune Tree specific Parameters(max_dept, min_child_weight, gamma, subsample, colsample_bytree). 
+# (3) Tune Regularization Parameters(lambda, alpha) for xgboost. This will help in reducing model complexity and enhance performance
+# (4) Lower the LR and decide the optimal parameters.
+
+# -------------- General Parameters of xgBoost
+# (1) Booster[default=gbtree]. There are 2 options:
+#		(a) gbtree
+#		(b) gblinear
+# (2) Silent: if = 0 then messages pop up helping us understand where we are at in the model
+# (3) nthread: 
+#		(a) this is parallel processing and number of cores in the system should be entered
+#		(b) if you wish to run on all cores no value should be entered and the algorithm will detect on it's own
+
+# --------------- Booster Parameters - Tree
+# (1) eta - default = 0.3
+#		(a) analogous to LR in GB
+#		(b) typical final values should be in the range: 0.01 - 0.02
+# (2) min_child_weight - default = 1
+#		(1) Regression: stop trying to split once the sample size in the node goes down a certain level
+#		    Minimum number of instances required in the node
+#		(2) Classification: Stop trying to split if you have reached a certain level of purity and your model can fit
+#		(3) Similar to min_child_leaf in GBM 
+#		(4) controls overfitting
+#		(5) too high values lead to underfitting
+# (3) max_dept[default=6]
+#		(a) controls overfitting
+#		(b) should be controlled using cv
+#		(c) typical values: 3-10
+# (4) max_leaf_nodes
+#		(a) maximum number of terminal nodes or leaves in a tree
+#		(b) can be defined in place of max_dept. so a dept of n will produce 2^n nodes
+# (5) max_delta_step - default = 0:
+# 		(a) maximum delta step that we allow each tree's weight estimation to be
+#		(b) if set to 0 then it means no contraint
+#		(c) useful in case of class imbalance
+# (6) subsample[default= 1]:
+#		(a) larger values will lead to overfitting
+#		(b) typical values: 0.5-1
+# (7) colsample_bylevel[default= 1]:
+#		(a) sample ratio of columns for each split, each level
+#		(b) subsample and colsample_bytree can be used instead of this
+# (8) lambda[default=1]:
+#		(a) L2 regularization of weights(ridge)
+#		(b) many DS do not use this
+# (9) alpha[default=0]:
+#		(a) L1 regularization term of weight(lasso)
+#		(b) used often
+# (10) scale_pos_weight[default=1]:
+#		(a) A value > 0 should be used in case there is a lot of class imbalance
+# (11) gamma [default = 0]: A node is split only if it gives a positive reduction in the loss. 
+#	Gamma specifies the minimum loss for doing a split.
+#	Gamma makes the algorithm conservative.
+
+# ------------- Learning Task Parameters
+# Objective/ Loss Function: 
+#		(a) binary: Logistic
+#		(b) multi: softmax. This returns predicted class not probabilities
+#		(c) multi: softprob. Returns probabilities
+
+# ------------- eval_metric --- evaluation in the validation data
+
+#    rmse – root mean square error
+#    mae – mean absolute error
+#    logloss – negative log-likelihood
+#    error – Binary classification error rate (0.5 threshold)
+#    merror – Multiclass classification error rate
+#    mlogloss – Multiclass logloss
+#    auc: Area under the curve
+
+# ------------- seed 
+# 		(a) default = 0
+# 		(b) for parameter tuning and 
+
+################################## --- start hyperparameter tuning for xgboost
+
+# --- step(1) --- get the optimum number of trees for our xgboost for the following fixed set of values
+# let's start with the some base values
+# (1) max_dept = 5. This should be 3-10. start with 5 but we can choose something between 4-6
+# (2) mid_child_weight = 1: a smaller value is chosen because it is a highly imbalanced class problem and leaf nodes can 
+#     have smaller size groups
+# (3) gamma = 0. ??? not quite sure what to take this in regression problems. For classification, 0.1-0.2 is also fine
+# (4) subsample, colsample_bytree = 0.8. typical values ranges between 0.5 - 0.9
+# the question here is why in terms of proportion. In RF and all we have sqrt(n) where n is the number of predictors
+# (5) scale_pos_weight = 1[default value] ??? for high class imbalance
+# remember that the cvresult obtained from xgb.cv which is the data frame. .shape[0] is the optimum number of trees
+
+# --- step(2) --- with the optimum number of trees obtained tune for the best max_dept and min_child_weight
+
+# we will not use early stopping rounds here anymore
+
+
+
+
+# ---- n_estimators and early_stopping_rounds
+# underfitting -> overfitting. increasing n_estimators will move you further down to the right. also remember the law of diminishing
+# returns. too large a value fot n_estimators will lead to overfitting meaning the results are too good in the training.
+# early_stopping_rounds will cause the model to stop overfitting. 
+
+# so it is adviceable to take a high value for n_estimators (500-1000) and have an early_stopping_rounds = 5.
+# which means that if the validation scores does not improve after 5 rounds fix the n_estimators at that level itself.
+
+#my_model = XGBRegressor(n_estimators=1000)
+#my_model.fit(train_X, train_y, early_stopping_rounds=5, 
+#             eval_set=[(test_X, test_y)], verbose=False)
+
+# --- the learning rate
+# xgboost simply does not add all the results of the model. Setting a high number for n_estimators and small learning rate 
+# this reduces the model propensity to overfit
+
+#my_model = XGBRegressor(n_estimators=1000, learning_rate=0.05)
+#my_model.fit(train_X, train_y, early_stopping_rounds=5, 
+#             eval_set=[(test_X, test_y)], verbose=False)
+
+# --- n_jobs
+# n_jobs for parallel processing. it is equal to the number of cores in your machine.
+
+# --- summary of xgBoost
+# n_estimators
+# early_stopping_rounds
+# learning_rate -> eta, 
+# n_jobs
+
+# --- additional parameters
+# gamma - L1 regularization 
+# max_dept - dept of each tree
+# lambda - L2 regularization
+# alpha - L1 regularization
+# minimum_child_weight - minimum number of instances required in the child node
+
+
+
+ways to control your nature
+Goal for the next few days
+# create code case study for Ensemble Energy
+
+# pyspark.ML.classifier import gbt.classifier
+# advantage is the work is the work get's distributed
+# (1) a lot of small jobs make as many partitions
+# (2) memory intensive - fewer number of partition
+
+# 
+# create case study for Sears MDO
+# update Linkin

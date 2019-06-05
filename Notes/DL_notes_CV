@@ -1,0 +1,1038 @@
+
+# ssh chubb@172.16.1.177
+
+# final AD creation 
+# Google DL
+
+# Searching for useful representations of some input data, within a predefined set of possibilities, using guidance from a feedback signal.
+
+# DL is a specific sub field of ML. it is the one which puts emphasis on learning successive layers of increasingly meaningful representation.
+
+# DL can be looked upon as a multi stage information distillation operation, where information goes through successive filters and becomes
+# increasingly purified.
+
+# the information on what a layer does to input data is stored in the weights
+# the weights are controlled and observed how far away from the output they are via the loss function
+# the loss function takes the predictions of the network and the true target and computes a distance score, capturing how well the network 
+# has done 
+
+# the Optimizer the fundamental trick in DL is to use this feedback score to change the weights in the direction, a little so that the 
+# loss reduces. The Optimizer implements back propagation.
+
+# Before the onset of DL
+# Brief history of ML
+# Probabilistic Modelling is application of Princeples of Statistics to 
+
+# then there are Kernal Methods
+# SVM solves the Classification problem by first
+(1) Mapping the data to a High Dimention Hyperplane where the Decision Boundary can be represented as a Hyperplane
+(2) A good Decision Boundary is choosen if the distance between the closest points and the Decision Boundary is maximum
+
+# Kernal Trick to find the best decision boundary in the new space representation we do not to compute the coordinates of  each points
+# but just find the distance between the pair of points in the new representation space. This can be done efficiently using a Kernel 
+# Function.
+# ---------------------- Deep Learning versus Shalow Learning 
+# There are fast-diminishing returns to successive application of shallow methods because the optimal first representation layer in a 
+# 3 layer model is not optimal first-layer or two-layer model.
+# What is tranformative about DL is that it allows the model to learn all layers of representation "jointly" rather than in succession.
+# Jointly - yes, imagine you have 3 layer Network. Then the weight on the 3rd node for the 5th feature is connected all the way to the
+# 3rd layer, nth node and 6th weight all the way as the back pass happens. 
+
+# There are two essential characteristics how deep learning learns from data:
+# (1) Incremental, Layer by Layer where increasing complex representations are developed
+# (2) these, intermediate incremental representations are learnt jointly.
+
+# DL is guided by experiental knowledge rather than theory
+
+# How things have changed for the better?
+# (1) Better Activation Functions
+# (2) Better Weight Initialization Schemes
+# (3) Better Optimization Schemes. or now perhaps even better Learning Schemes
+
+# the core building block of NN is a Layer. A layer extract representations of data. Chaining of different layers which leads to a Data
+# Distillation process. DL is like a sieve for data processing made of a succession of increasiningly refined data filters - the layers.
+
+# Our Network consists of Two Dense Layers which densely connected or fully connected
+# The second and the last layer is a 10-way Softmax Layer, which means it will return a array of 10 probabilities Scores which will
+# return a probability scores.
+# Each Score is probability that it is one of the 10 digits.
+
+# Things you will need to make the Network ready for training we need the following:
+# (1) Layers
+# (2) Loss Function
+# (3) An Optimizer
+# (4) Metrics to Monitor during Training and Testing. What are these metrics?
+
+# (2), (3) and (4) come in the compilation step.
+
+train_images.shape
+Out[25]: (60000, 784)
+
+# Key Attributes of a Tensor are:
+# (1) Number of Axes
+# (2) Shape
+# (3) Data Type
+
+T = array([[[1,2,3]],
+           [[4,5,6]],
+           [[2,3,4]]])
+# dimention = 3
+T = array([[[1,2,3], [1,2,3],[1,2,3]],
+           [[4,5,6], [1,2,3], [1,2,3]],
+           [[2,3,4], [1,2,3], [1,2,3]]])
+# dimention = 3
+
+# Taking about tensors, TS is 3 dimentional - Features, Time Steps and Samples
+# Image is 4D tensors - height, width, channels and samples
+# Video data is 5D tensor - sample, frames, height, width, channels
+
+# More on Video Data: 60-second, 144*256 YouTube video clip sampled at 4 frames per second would have 240 frames.
+# a batch of four such video clips would be stored in a tensor of shape (4, 240, 144, 256, 3)
+# Much as any computer program can be reduced to a small set of binary operations on binary inputs(AND, OR, NOR and so on),
+# all transformations learnt by Deep Neural Networks can be reduced to a handful of Tensor Operations applied to tensors of 
+# numeric data.
+
+# what is the shape of np.array([1,2,3])
+# ans. (3,)
+# -------------- properties of Tensors 
+# (1) Number of axes
+# (2) Shape
+# (3) Data Type
+
+# why we love numpy ?
+# NumPy stores data in contiguous block of memory, independent of other built-in Python objects. NumPy library of algorithms are written 
+# in C can operate on this memory without any type checking or other overhead. 
+# Numpy operations perform complex computations on entire arrays without the need for Python for loops.
+
+# when two tensors have dimention greater than 1 then dot product is no longer symmetric.
+
+# recruitment
+# Structured DL thread for more well informed decision for the subsequent iterations - complex to hard
+# being involved in more of the solutioning bit of things rather than in the actual execution
+
+# DL analogy to crumpled paper. Each layer in the DL model works as a transformation to uncrumple the paper a bit and then a bit more 
+# and so on.
+# TF: the architecture is static. pyT the execution is not static
+# FastAI is built from PyTorch. state of art many. fastAI is a course and there is a library
+
+# RNNs
+# it processes sequences by iterating through the sequence elements and maintaining a state containing information relative to what it had seen 
+# so far. So for every 't', a state is derived which is a function of current state (on (t-1)) and input, the current input.
+# the current input state i.e. at 't', is derived from the activation function.
+
+state_t = 0
+for input_t in input_sequence:
+	output_t = activation(dot(W, input_t) + dot(U, state_t) + b)
+	state_t = output_t
+# the dot operation is nothing but matrix multiplication
+
+
+# geometrical interpretation of DL
+# NN can be interpretted as a very complex geometric transformation in a high-dimentional space implemented via a long series of simple steps.
+# Imagine a 3 D, 2 sheets of papers Blue and Red. Crumple them together into a small ball. That crumpled ball is your input data and each
+# sheet is a class in your classification problem. what your NN will do is to figure out a transformation that will uncrumple the sheets
+# part by part until you have clearly separable sheets of paper.
+# with DL, this will be implemented as a series of simple transformations of the 3D spacesuch as those you can implement on the paper with your 
+# fingers - one movement at a time. Each layer in your DL will apply a transformation which will disentangle the paper a bit. 
+
+# interpretation of layers  ---------------- (1)
+# if you remember CNN each layer is nothing but a filter. likewise in a NN, each layer acts like a filter which brings out certain specific
+# aspects of the data. "Layers extract representations from the data, hopefully representation which is important to the problem at hand."
+# Layer is defined by the number of nodes and the number of inputs. Most of the DL consist of chaining layers. The layer acts as a filter 
+# two subsequent layers acts both as a filter and interactions.
+
+# interpretation of layers  ---------------- (2)
+# More number of Nodes in a layer you add, the more you are saying there are different interpretations of the input data. 10 Node layer is 
+# a place where you say that the input data is properly represented by a 10 dimentional hyperspace rather than say 5.
+# based on feedback the weights will be forced to extract what is needful from the data.
+# A Node is like one aspect of the data. Another node is another aspect of the data.
+
+# Engine of NN: Gradient Based Optimization
+# each layer transforms the input data as follows: output = relu(dot(W, input) + b)
+# W and b are the tensors that are the attributes of the layers. They are called weights or trainable parameters.
+# These weights contains information that are learnt from exposure to the data.
+# random initialization is random assignment of these weights
+
+# Training Loop: ------------------------------------- (1)
+# (1) Draw a batch of x samples and corresponding y's
+# (2) Run the Network on x(a step called forward pass) to obtain predictions y_pred
+# (3) Compute the loss - a measure of mismatch between y_pred and y
+# (4) Update all the weights in the model so as to reduce the loss a bit
+
+# Point (4) above is the most difficut above. You are faced with 2 questions:
+# (1) Left or right
+# (2) By how much.
+
+# why certain activation functions?
+# f(x + epsilon_x) = y + epsilon_y
+# In addition because the function is smooth. we can write:
+# f(x + epsilon_x) = y + a * epsilon_x
+# the slope a is called the derivative of f at the point p. if a is -ve, a small change of x around p will lead to decrease of f(x)
+# further more the magnitude of a will tell us how much of an increase or decrease.
+# Differentiable means the function can be derived. For example smooth function can be derived.
+
+# Gradient is a derivative of Tensor Operation. It is a generalization of the concept of derivatives to functions of multidimentional inputs
+# Consider an input vector x, a matrix W, a target y and compute the loss or mismatch between y_pred and y
+# y_pred = dot(W, x)
+# loss_value = loss(y_pred, y)
+
+# if the data inputs x and W are frozen then this can be viewed as a functional mapping of W to loss values:
+# loss_value = f(W)
+# let's say the current value of W is W0. Then the derivative of a function f in the point W0 is a tensor gradient(f)(W0) with the same shape
+# as W and where each co-efficient gradient(f)(W0)[i,j] indicates the direction and magnitude of change in loss value observed when
+# modifying W0[i,j]. 
+
+# Gradient f can be interpretted as curvature of f(W) around W0. 
+# changes are done with respect to W1 = W0 - step * gradient(f)(W0)
+# As you cn see intuitively, the step factor plays an important role, if too small then it will take a lot of iterations before you get the 
+# minimum. Whereas if it's too large, it will take you places.
+
+# what is Stochastic Gradient Descent?
+# It is a optimizing technique
+# given a contineous function, it is possible to arrive at it's minimum by simply finding the point where the derivative is 0.
+
+# ------------- EPOCH	
+# in one epoch all of data and both forward and backward pass
+
+
+# what would happen if we run iteration on the entire data rather than on a batch?
+# this will be more accurate but very expensive.
+# this also shows that mini-batch thing does not contribute to any accuracy thing. However later on we will see how 
+# overfitting and underfitting is related to batch size
+# overfitting is associated with fewer number of samples in case of DL and not quite so the case for ML. The logic being when you have 
+# large amount of data, your model will be exposed to every single aspect of your data.
+# overfitting - when it shows in the early epochs then it means that your sample is too small
+
+# overfitting strictly means model on Train and Test. But what if my data is very simple but have a Million Observations and then I fit
+# a over complicated model. Will it still overfit.
+# So a very simple data but large amounts of data but a very complicated model. In this case more data will sort of act as a Regularization
+# factor 
+
+# Muti dimentional space not quite shares the same properties with 2 dimentional space
+# This has historically shown to have created issues in the DL space. 
+# Also remember that the curves are nothing but loss surfaces(function of W)
+
+# there are multiple versions of SGD which takes into account the previous value before moving on to the next. There are versions such as 
+# (1) SGD with momentum
+# (2) Adagrad
+# (3) RMSprop
+
+# ------------------- Process Flow for NN 
+# Stochastic Gradient Descent derives it's name as it draws out batches at random
+
+# the 4 step algorithm in (1) discussed above is more elaborated below:
+# (1) Draw a batch of training samples x and corresponding targets y
+# (2) Run the network on x to obtain predictions y_pred
+# (3) Compute the loss on the network on the batch, a measure of mismatch between y_pred and y. This is forward pass
+# (4) Compute the gradient of loss with regard to the network parameters --- the backward pass
+# (5) Move the parameters a little in the opposite direction from the gradient. For example, W = W - step*gradient. This will reduce 
+#     the loss on the batch a bit.
+
+#network = models.Sequential()
+#network.add(layers.Dense(512, activation='relu', input_shape=(28 * 28,)))
+#network.add(layers.Dense(10, activation='softmax'))
+#
+#network.compile(optimizer='rmsprop',
+#        loss='categorical_crossentropy',
+#        metrics=['accuracy'])
+# network.fit(train_images, train_labels, epochs=5, batch_size=128)
+
+# (1) the network will start to iterate on the training data in mini batches of 128
+# (2) the network will compute the gradients of the weights with regards to loss in the batch
+# (3) update the weights accordingly
+
+# --------------- protocol for training a Neural Network - which epoch to stop at !!!
+# Separate out the Train and the Validation data. Test is someone very isolated altogether. Plot the x-axis - the number of epochs, y-axis
+# the loss. The point where the train and validation intersects is the optimal number of epochs. 
+# then combine the Train and Validation data. Fit a model(or create a model for the entire data).
+# always #epochs versus Train and val Loss and #epochs versus Train and Validation Accuracy 
+
+# Move on to the Test Data
+
+
+################ --- lesson learnt --- batch versus all samples versus loss 
+# batch is just a mechanism for taking the entire data with less memory consumption
+
+# batch is forced rather than random
+# batch = train_images[128 * n:128 * (n + 1)]
+
+# The concept of Momentum
+# takes care of 2 issues at once:
+# 	(1) Convergence Speed
+#	(2) Local Minima
+
+# --------------- Back Propagation --------------
+# Back Propagation starts with the final loss value and works backwards from the top layers to the bottom layers, applying chain rule to 
+# compute the contribution of each parameter had to the loss value.
+
+
+# Symbolic Differentiation is used. Tensor Flow uses this. For a given a chain of operations with a known derivative, we can compute a
+# Gradient Function which maps the parameter values to gradient values.
+
+# the concept of Local Minima and Global Minima
+# Normal optimizers usually ends near the local minima. An important concept will be comparing a ball, if not enough momentum, the ball 
+# will get stuck at the local minima. 
+# Momentum is implemented by moving the ball each step based on 
+#	(1) Current slope value
+# 	(2) Current Velocity resulting from past acceleration
+# the primary idea behind momentum is getting to the optimum faster
+# What does it mean the update on 'w' should factor in both current gradient value and previous parameter update?
+
+# past_velocity = 0.
+# Constant momentum factor
+# momentum = 0.1
+# Optimization loop
+# while loss > 0.01:
+	# w, loss, gradient = get_current_parameters()
+	# velocity = past_velocity * momentum + learning_rate * gradient
+	# w = w + momentum * velocity - learning_rate * gradient ---------------------(1) 
+	# past_velocity = velocity
+	# update_parameter(w)
+# as you can see subsequent weights get updated because of applying momentum
+# refer to python notebook 1 for further 
+
+# network.fit(train_images, train_labels, epochs=5, batch_size=128)
+# the network will start iterating on the training data in mini-batches of 128, 5 times over(each iteration over ALL of the training data 
+# is called an EPOCH)
+
+# At each Iteration, the network will calculate the gradients of the weights with respect to the loss on the batch and update the weights 
+# accordingly. 
+
+# After 5 epochs, the network will have performed 2,335 gradient updates (469 per epoch) and the loss on the network will be sufficiently 
+# low that the network will be capable of classifying hand written digits with high accuracy.
+
+# Notion of batches in NN
+# batch = train_images[:128]
+# nth batch = train_images[128*n:128*(n+1)]
+# element wise operation and addition in . For the naive code refer to 
+
+# you can do a forced split but always shuffle the data before you validate
+
+
+####### refer to python notebook 1 for naive implementation of relu and addition of tensors ####
+
+# what is keras.layers.Dense(512, activation='relu')?
+# is equivalent to output = relu(dot(W, input) + b). W here will relate to 512 nodes w's.(notice the use of Capital W and small w)
+# dot(W, input) is nothing but matrix multiplication
+# enter 2D tensor into dot(W, input) - output another 2D tensor. This tensor + b
+# finally relu on each of the element in the 2D tensor.
+
+# sequence data is stored in 3D tensors consisting of samples, timesteps and features
+# 2D tensors examples will be images
+
+# from keras import layers
+# layer = layers.Dense(32, input_shape=(784,)). 
+
+# it means the layer accepts a 2D tensor whose first dimention, the number of rows is 784. This layer will then return a tensor whose 
+# first dimention will be 32
+# hence this layer will be connected to a downstream layer which will expect 32 DIMENTIONAL VECTORS
+
+# model = models.Sequential()
+# model.add(layers.Dense(32, input_shape=(784,)))
+# model.add(layers.Dense(32))
+
+# Network Topologies:e
+# the most common among them are:
+# 	(1) Two-Branch Network
+#	(2) Multi-head Network
+#	(3) Inception Block
+
+# Once Network Architecture is defined you will have to configure the learning process via:
+# (1) Loss Function
+# (2) Optimizer - determines how the network will be updated based on Feedback from the Loss Function.
+
+# A NN with multiple outputs can have multiple loss functions. But the gradient descent will be based on a single scaler value.
+# so all losses will have to be combined.
+
+# ############### --- choose the right Objective/ Loss Function is important 
+
+# Keras workflow:
+# 	(1) Define Training Data: Input Tensors and Output Tensors
+# 	(2) Define the network of layers that maps inputs to output
+#	(3) Configure the learning process by choosing a loss function, optimizer and some metrics to monitor
+#	(4) Iterate the Training data by calling the fit() method.
+
+# 2 ways to define a model: 
+#	(1) using the sequential class - only for Linear Stack of layers
+#	(2) Functional API - for directed acyclic graph of layers which lets you build completely arbitary architectures
+
+# Configering the learning process is done in the compilation step where you define the optimizers and loss function and the metrics you 
+# want to monitor during the training process.
+from keras import optimizers
+model.compile(optimizer= optimizers.RMSprop(lr=0.0001),
+		loss = 'mse',
+		metrics=['accuracy'])
+
+model.fit(input_tensor, target_tensor, batch_size=128, epochs=10)
+
+
+
+
+# examples of rightly choosen Objective function
+# 	Binary Cross Entropy for Binary Class Model
+# 	Categorical Cross Entropy for Multi Class Model
+# 	MSE for Regression 
+# 	connectionist Temporal Classification for sequence-learning problem
+
+# the next part is going to be around using keras for predicting imdb reviews
+
+########### --- refer to python notebook 2
+
+
+# ############# --- the one hot encoding for sequential models --- 
+# based on the vocabulary, the sentences will be of the form [1,34,2,4,5,6] etc. And the data will be of the form train_data.shape = (n,)
+# each n can be of different length.
+
+
+
+#def vectorize_sequences(sequences, dimention = 10000):
+#    results = np.zeros((len(sequences), dimention))
+#    for i, sequence in enumerate(sequences):
+#        results[i, sequence] = 1.
+#    return results
+#
+#x_train = vectorize_sequences(train_data)
+#x_test = vectorize_sequences(test_data)
+
+#x_train.shape = (25000, 10000)
+
+# a type of Network which performs well in such kind of problem is Dense(16, activation='relu')
+
+# ------------------- On Dimentions of Weight Matrix versus Input Matrix
+# having 16 units means that the Weight Matrix will be of shape (input_dimention, 16) --------------- IMPORTANT
+# if you have 10000 features and 25000 observations then the input matrix is (25000, 10000)
+# Dimentionality of the Representation space can be understood as "how much freedom you are giving your Network to learn internal 
+# representations".
+# Having more Hidden Units will make the Network overfit which is it will do great in Training Data but not so great in the Test Data.
+# Recall the defination of Dense: relu(dot(W, input) + b)
+
+
+# ------------- why a non linear activation function is required ?
+# when we multiply with 16 units, the hypothesis space will consist of a set of all possible linear transformations of the input space 
+# into a 16 dimentional space. 
+# In order to get access to a much richer hypothesis space, we need to use non linear functions on the linear transformation.
+# examples of activation functions are: 'relu', 'elu', 'prelu' etc.
+
+# also consider the following for a single layer NN:
+# a[1] = z[1] = w[1]x + b[1] ----------- (1)
+# a[2] = z[2] = w[2]a[1] + b[2] ----------- (2)
+# from (1):
+# a[2] = w[2](w[1]x + b[1]) + b[2]
+# a[2] = w'x + b'
+
+#from keras import models
+#from keras import layers
+#model = models.Sequential()
+#model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
+#model.add(layers.Dense(16, activation='relu'))
+#model.add(layers.Dense(1, activation='sigmoid'))
+
+# finally we need to select a loss function. since we are predicting a binary
+# binary_cross_entropy is the most evident choice.
+
+#from keras import losses
+#from keras import metrics
+#model.compile(optimizer=optimizers.RMSprop(lr=0.001),
+#              loss=losses.binary_crossentropy,
+#              metrics=[metrics.binary_accuracy])
+
+# overfitting and epochs are related. more epochs lead to overfitting.
+# bigger batch size leads to overfitting ???
+
+#model = models.Sequential()
+#model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
+#model.add(layers.Dense(16, activation='relu'))
+#model.add(layers.Dense(1, activation='sigmoid'))
+#model.compile(optimizer='rmsprop',
+#loss='binary_crossentropy',
+#metrics=['accuracy'])
+#model.fit(x_train, y_train, epochs=4, batch_size=512)
+#results = model.evaluate(x_test, y_test)
+
+# further experiments:
+# try using 1 or 3 hidden layers
+# try using hidden layers with fewer than 16 or more units like 32
+# change the activation function to tanh
+# change the loss function from binary cross entropy to mse
+
+# -------------- Loss of Information ---------------
+# If the number of units in a layer is less, there is possibility of losing information. Also if a previous layer loses information, that 
+# information is lost once and for all. 
+# More the categories in the data, the more information we need to capture and hence more units we need to use.
+# from an ML perspective, more categories means more information need to be exploited !!! Meaning the number of nodes should be at least N
+# when reducing the number of layers, we are compressing a lot of information. Geometrically it means the absence of hyper planes 
+# is resulting in compression of information.
+# For more categories (> 2) we prefer using a 'softmax' function for prediction of probabilities for multiple categories
+# --------------- the last layer will have a activation function corresponding to the kind of problem we are predicting
+# 
+
+# when plotting we plot on the x-axis the #epochs and the y-axis - loss or accuracy.
+# when plotting train and vadidation accuracy the place where train curve and validation curve meets is the #epoch after which we will face
+# overfitting.
+
+# ---------------- the regression example --- on importance of scaling
+# it is problematic for a NN to work on features with different units. The NN is capable of adapting to these differences but it will make 
+# learning all the more easy if we standardize our data. 
+# for a regression problem the Network will end with a single unit and no activation.
+
+# probably the reason for this being is what we are doing at each layer is trying to represent the data in a multi dimentional space.
+
+# ---------------- On Validation: Page 81 for code.
+# Initially we separate out a sample from the train as follows
+# x_val = x_train[:1000]
+# partial_x_train = x_train[1000:]
+# y_val = one_hot_train_labels[:1000]
+# partial_y_train = one_hot_train_labels[1000:]
+
+# ------------------- K Fold Validation -----------------
+# K =3
+# <Fold 1> [validation], [training], [training] ---------> Validation Score #1
+# <Fold 2> [validation], [validation], [training] ---------> Validation Score #2
+# <Fold 3> [training], [validation], [validation] ---------> Validation Score #3
+# Final Score = Average	
+
+# ############# Cross Validation does not involve random splits !!!
+
+# what happens when we introduce cross validation to NN?
+# (1) For each fold, a model is created using the validation and train split
+# (2) the model derived above is the result of 500 (#epochs) models
+# (3) corresponding to each of these 500 models there will be 500 validation scores
+# (4) hence the error log file will consist of error_log_file = 
+# [[500 val scores for 500 epochs],[500 val scores for 500 epochs], ... K ]
+# (5) To derive the optimal number of epochs, Average out the [[...,i, ...],[...,i, ...],[...,i, ...], ... K folds]
+# (6) Plot #epochs in x-axis, the average error in y-axis
+
+
+
+################## --- Section 1----
+#import numpy as np
+#k = 4
+#num_val_samples = len(train_data) // k
+#num_epochs = 100
+#all_scores = []
+#
+#for i in range(k):
+#    print('processing fold #', i)
+#    val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples]
+#    val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
+#    partial_train_data = np.concatenate(
+#    [train_data[:i * num_val_samples],
+#    train_data[(i + 1) * num_val_samples:]],
+#    axis=0)
+#    partial_train_targets = np.concatenate(
+#    [train_targets[:i * num_val_samples],
+#    train_targets[(i + 1) * num_val_samples:]],
+#    axis=0)
+#    model = build_model()
+#    model.fit(partial_train_data, partial_train_targets,
+#    epochs=num_epochs, batch_size=1, verbose=0)
+#    val_mse, val_mae = model.evaluate(val_data, val_targets, verbose=0)
+#    all_scores.append(val_mae)
+
+
+################## --- Section 2---- deciding the underfitting number of epochs
+
+# also all of Train, Validation and Test are important for us
+# Train and Validation will be from the same data
+# the following code will result creating average_mae_history = [[validation loss for each epoch],[validation loss for each epoch],
+# [validation loss for each epoch],[validation loss for each epoch]]
+#num_epochs = 500
+#all_mae_histories = []
+#
+#for i in range(k):
+#    print('processing fold #', i)
+#    val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples]
+#    val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
+#    
+#    partial_train_data = np.concatenate(
+#    [train_data[:i * num_val_samples],
+#    train_data[(i + 1) * num_val_samples:]],
+#    axis=0)
+#    
+#    partial_train_targets = np.concatenate(
+#    [train_targets[:i * num_val_samples],
+#    train_targets[(i + 1) * num_val_samples:]],
+#    axis=0)
+#    
+#    model = build_model()
+#    history = model.fit(partial_train_data, partial_train_targets,
+#    validation_data=(val_data, val_targets),
+#    epochs=num_epochs, batch_size=1, verbose=0)
+#    mae_history = history.history['val_mean_absolute_error']
+#    all_mae_histories.append(mae_history)
+
+# design of experiment for DL combined with Cross Validation
+# if K = 3, then what happens you train on 2/3 and you predict on the remaining 1/3. That gives you 4 results or losses
+# now for each epoch (one complete run on the data)
+# so if there are 500 epochs(500 number of times the weights are updated after complete run on the entire data).
+# for any x in all_mae_histories, len(x) = 500. there are 4 such x.
+
+
+# the primary problem in ML is overfitting
+# the 4 main branches of ML are
+#	(1) Supervised Learning
+#	(2) Unsupervised Learning
+# 	(3) Self supervised Learning
+#	(4) Reinforcement Learning
+
+# -------------------- (1) Supervised Learning 
+# Types of Supervised Learning:
+#	(1) Sequence Generation: Given a picture, predict a caption describing it. Sequence Generation can be reformulated as a series of 
+# 		Classification problem.
+#	(2) Syntax Tree Prediction: Given a sentence, predict it's decomposition in terms of syntax tree
+#	(3) Object Detection: create a bounding box around certain objects in the picture
+#	(4) Image Segmentation: Given a picture, draw a pixel-level mask on the specific object
+
+# -------------------  (2) Unsupervised Learning
+# This is the often the first step to Data Understanding. Dimentionality Reduction and Clustering are well known algorithms on the same.
+
+# -------------------  (3) Self Supervised Learning
+# This is supervised but the labels are tagged not by humans but machines using some heuristics
+
+# -------------------  (4) Reinforcement Learning 
+# here the agent recieves information from it's surrounding and tries to act in a way that maximizes it's rewards.
+# Examples: NN which "looks" at video game screen and outputs game actions which maximizes it's score can be trained using Reinforcement Learnin
+
+# Epochs and overfitting, the importance of trying out on never before seen data is the event of overfitting. 
+# After a few epochs the data starts overfitting. 
+
+# ----- Train, Validation and Test --- the virtue of doing this and the Information Leaks
+# There is the concept of Information Leaks. When you run the model once then there is no question of Information Leaks. However consider the 
+# design for NN. You split the train into Train and Validation. This is a force split. Given code below:
+# x_val = x_train[:1000]
+# partial_x_train = x_train[1000:]
+# y_val = one_hot_train_labels[:1000]
+# partial_y_train = one_hot_train_labels[1000:]
+# for every epoch we try and minimize the loss on the validation. The Gradient Descent Algo. is connected to validation loss.
+# This is why the information from the Validation Set above will leak into the model. The Result is overfitting.
+# More the number of Iterations(repeat on the data), the more the Information Leak.
+# At the end of the day, you will end up with a model which does artificially well on the validation set.
+
+# Hence we need a data from which we have no information leak whatsoever. This is the Test Data set.
+
+# ----- Training, Validation and Test --- things that you need to keep in mind 
+# (1) data representativeness: make sure the data is shuffled properly
+# (2) arrow of time: temporary leak - when a future time is in the train data
+# (3) Training and Validation data should be completely disjoint.
+
+# ----- On Vectorization
+# whatever data that you deal with should be first transformed into Tensors.
+
+# PySpark along with ETL. Python and SPark. Scala and JAVA ETL Python Spark.
+# Scala and Spark. With Professional experience 1.5 years. 
+# 
+
+# -------------- Data Pre-processing for NN
+
+# (1) Data vectorization
+# (2) Value Normalization: before you cast the data into the NN, set each value as float32 so you end up with values between 0 and 1
+#     If you have large values it will prevent the NN gradient from converging.
+
+# ----- for convergence of Gradient
+# (1) most values should be small in the range of 0 - 1
+# (2) values must be homogeneous. they should be within the same range
+
+# ----- pro-processing popular steps
+# (1) Normalize each value independently to have a mean of 0
+# (2) Normalize each value to have a stdev of 1
+
+# ----- Pre-processing handling missing values
+# (1) it's ok to have missing values in the train but not the other way round
+# (2) it's ok to replace missing values with 0 provided 0 is meaningful
+
+# --- Feature Engineering 
+# the purpose is to build a simpler Network
+# good features help you solve the problem with lesser data
+# unlike DL ML does not create hypothesis spaces around 
+
+# --- Overfitting versus Underfitting
+# Training and Validation is like war of the worlds. Overfitting when from the training data, the model begins to learn patterns which are
+# present only in the training data.
+# Getting more training data can help curb overfitting. 
+
+# Ways to deal with Overfitting
+# (1) Get more training data
+# (2) modulate the quantity of info. your model is allowed to store. This is called Regularization. 
+#     here the weights are made more regular by means of Regularization. This is done by adding to Loss function a cost associated with having
+#     large weights.
+#			(1) L1: cost added is proportional to the absotute value of sum of it's weights
+#			(2) L2: cost added is proportional to the sum of squares of the weights.
+# (3) Reduce the Network size
+# (4) Add Weight Regularization
+# (5) Add drop out
+
+# Regularization by means of Penalizing Parameters
+
+# Code to implement regularization
+#from keras import regularizers
+#model = models.Sequential()
+#model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001), this means we are adding 0.001 value to the weight
+#activation='relu', input_shape=(10000,)))			       this is the penalization 
+#model.add(layers.Dense(16, kernel_regularizer=regularizers.l2(0.001),
+#activation='relu'))
+#model.add(layers.Dense(1, activation='sigmoid'))
+
+# Regularization by means of Drop out --- (1)
+# Drop out applied to a layer consist of randomly setting the output of the layer to zero.
+# For example, let's say that a given layer will output a vector [0.2, 0.5, 1.3, 0.8, 1.1]. After applying drop out the output maybe reduced to
+# [0, 0.5, 1.3, 0, 1.1].
+# Drop out rate is the fraction of the features that are zeroed out. It is usually set to 0.2 to 0.5
+# For every example, iteration, drop out is different, different neurons are dropped out in different iteration and example
+# at training time we zero out randomly a .5 fraction of the values in the matrix
+#		layer_output *= np.random.randint(0, high=2, size=layer_output.shape)
+# at test time, we scale down the output by 0.5
+# 		layer_output *= 0.5
+#  
+
+# Drop out by default is used mostly in the sphere of Computer Vision
+# ----------------- Defining the problem and assembling the data
+# For non stationary problem where you are predicting the buying pattern input the time as well
+
+# ------------------- UNIVERSAL WORKFLOW OF MACHINE LEARNING ---------------
+# (1) Input Data: sometimes you will have to redefine your event a bit just so that the algorithm is able to capture the differences 
+# properly. This is called purity of the data.
+# (2) Is it binary or multi class. It's always better off to predict binary versus a multi class. Multi class means more complexity in 
+# your model. Remember for a multi class model, we need more nodes
+# (3) Dealing with non stationary problems: make sure that you have the time of the year as input to the training data
+# (4) choosing the measure of success: also called Evaluation Metric
+#		(1) Perfectly Balanced Problem: RoC/ AUC
+#		(2) Class Imbalanced Problem: Precision and Recall
+#		(3) Ranking or Multiclass Problem: Mean Average Precision
+# (5) Evaluation Protocol:
+#		(1) Maintaining a Hold out Validation set - more hold out the better off we are
+#		(2) Doing K-fold validation - especially when you have a very few samples
+#		(3) Iterated K-fold - when we have very few samples. Shuffling the data everytime you extract fold.
+# (6) Preparing your data: 
+#		(1) data should be formatted as Tensors
+#		(2) Values taken by the tensors should be as less as possible between [0,1] or [-1,1]. they should be scaled
+#		(3) Heterogeous - if different features have different ranges they should be scaled
+#		(4) Features Engineering - becomes important especially when you have small data set. The self feature engineering comes 
+#		    into play only when you have large data.
+
+
+# ------------- developing a model which is better than the baseline
+# ------------- 3 key choices to make your model working better
+# (1) Last-Layer Activation: for example in the IMDB example we used Sigmoid
+# (2) Loss Function: this should match the kind of problem we are solving. For IMDB, we used binary_crossentropy. For regression, we use MSE
+# (3) RMS prop: what optimizer you will be using and what will be it's learning rate. In most cases, it is safe to use RMSprop with the 
+#     default Learning Rate.
+
+# ------------ developing a model which is better than the baseline/ choice of Loss Functions
+# Loss Functions is associated with the last layer. Not all metrics can be used as a Loss Function. The reason: not all functions are 
+# differentiable. Hence they cannot be backward propagated. For example ROC AUC is not differentiable. We used it's closest proxy such as 
+# cross entropy.
+
+# ----- Choosing the right Last Layer Activation and the corresponding Loss Function
+# Binary Classification --- sigmoid --- binary cross entropy
+# Multiclass, single-label classification --- softmax --- categorical_crossentropy
+# Multiclass, multilabel classification --- sigmoid --- binary_crossentropy
+# Regression --- None --- mse
+# Regression to values between 0 and 1 --- sigmoid --- mse of binary crossentropy
+
+# ----- how do you get your model to overfit
+# there are three ways by which you can make your model overfit:
+#	(1) Add Layers
+#	(2) Make layers bigger
+#	(3) Train for more epochs
+
+# Overfitting Test: when you see a lot of disparity between Training and Validation, you have achieved overfitting.
+# ------------ from Overfitting to Underfitting
+# (1) Add Drop out
+# (2) Try different Architectures - add or remove layers
+# (3) Add L1 and L2
+# (4) Try other different Hyperparameters such as # units per layers, LR
+# (5) Add a few Features or remove features
+
+# ----- overfitting and underfitting -----
+# Everytime you are using the feedback from the validation to retrain the parameters of the model you are sort of inviting Information Leakage
+# Test remains as Test. After you get a good model from Train and Validation. Combine Train and Validation and train the model again. Finally
+# predict on the Test again.
+
+# ----- Process of Training the model
+# (1) Train the model - use train and validation
+# (2) Once you have trained and validated. Train the model again on the entire data train + validation.
+# (3) Revaluate the model once again on the Test Data. If it turns out that your Test Performance is far worse then your validation Protocol 
+#     is not correct. 
+# --------------------- Try iterated K-Fold validation ---------------------
+
+# ------------- revisit the assumptions ----- check this with subsequent notes
+# the dense layer
+# the number of input features = 2, x1 and x2
+# single layer NN with 3 nodes
+#Dense Layer meaning: relu(dot(W,x)+b)
+# W = [[w1[1], w1[2], w1[3]], [w1[1], w2[2]]],
+# X = [[x(1)1,x(1)2], [x(2)1,x(2)2],[x(3)1,x(3)2],[x(4)1,x(4)2],[x(5)1,x(5)2]]
+# dot(W, X) is the representation of data in 3 dimentional hyperplane
+# which gives: [Node 1
+# [[w1[1]x(1)1+w2[1]x(1)2],
+# [w1[1]x(2)1+w2[1]x(2)2],
+# [w1[1]x(3)1+w2[1]x(3)2], --------------------- apply relu() to each. calculate the sum of loss
+# [w1[1]x(4)1+w2[1]x(4)2],
+# [w1[1]x(5)1+w2[1]x(5)2]]
+
+# for Node 2:
+# [[w1[2]x(1)1+w2[2]x(1)2],
+# [w1[2]x(2)1+w2[2]x(2)2],
+# [w1[2]x(3)1+w2[2]x(3)2], --------------------- apply relu() to each. calculate the sum of loss
+# [w1[2]x(4)1+w2[2]x(4)2],
+# [w1[2]x(5)1+w2[2]x(5)2]]
+
+# for Node 3:
+# [[w1[3]x(1)1+w2[3]x(1)2],
+# [w1[3]x(2)1+w2[3]x(2)2],
+# [w1[3]x(3)1+w2[3]x(3)2], --------------------- apply relu() to each. calculate the sum of loss
+# [w1[3]x(4)1+w2[3]x(4)2],
+# [w1[3]x(5)1+w2[3]x(5)2]]
+
+
+# --------------- CNN 
+# the two parts of CNN are:
+# (1) run the images through a series of convolution layers Conv2D
+# (2) the next step is to feed the last output tensor into a Dense layer. you will obviously have to flatten the 3D images to 1D for that
+# (3) # model.add(layers.Flatten())
+#     # model.add(layers.Dense(64, activation='relu'))
+#       model.add(layers.Dense(10, activation='softmax'))
+
+# Why does CNN work so well as compared to Densely Connected Networks?
+# Because of Conv2D and MaxPooling2D. They make the Network learn Local Patterns as opposed to global pattern learnt by Dense NN
+
+# what are the 2 key characteristics of CNN ?
+# (1) The patterns they learn are translation invariant
+# (2) They can learn spatial heirarchy of patterns
+
+# (1) The patterns they learn are translation invariant: after learning a certain pattern in the lower right corner of the picture, a convnet 
+# can recognise it anywhere. A densely connected Network on the other hand will have to learn the pattern anew if the pattern occurs 
+# anywhere else in the picture. The visual world is fundamentally translation invariant.
+
+# (2) They can learn spatial hierarchy of patterns: The first conv layer will learn small local patterns such as edges, the second conv layer
+# will learn larger patterns made from the features of the 1st layers(such as the outline of the image etc.). Visual world is fundamentally 
+# sptially hierarchical.
+
+# Feature Map and Spatial Map in CNN
+# the input Feature Map is a (28,28,1). Output Feature Map is (26,26,32). 
+# Each Dimention of the Output Map is a Feature(also synonymously called Filter) and the 2D Tensor output [:,:,n] is a 2D spatial map of the
+# response of this Filter over the Input.
+
+# Convolutions are defined by:
+# Size of the patches extracted from the input: This is the size of the Filter. Commonly, 3*3 or 5*5
+# Dept: The number of filters calculated by the convolution
+
+# so if input has a dept of 3 and you are applying 5 filters then what is the actual dept of the so the output dept will be 15 ???
+
+# What is padding? what are the factors infuencing output feature slides?
+# Padding consists of adding appropriate nunber of rows and columns in each side of the output feature map so as to have the 
+# same dimention as the inout feature map.
+# The factors influencing output feature size are: (1) Filter Size (2) Stride
+
+# to downsample use max pooling. Size of the Input Feature Map is halved after using Max Pooling
+# max pooling is usually done with a 2*2 windows and a stride of 2 to downsample the Feature Map by half.
+
+# why do we need max pooling at all?
+# to learn the spatial heirarchy of things. the higher level patterns learnt by the model will be very small.
+# secondly the final feature map will consist of (a, b, c) which is a*b*c co-efficients per sample. 
+# if we are to pass this information to a Dense layer of size 512, that will be a total of 512*a*b*c co-efficinets.
+# so in short max pooling is required to reduce the number of Feature Map cf's as well as to induce spatial-hierarchies
+
+# alternative to max pooling is average pooling. In general max pooling works better.
+# Why the name feature map? because fetures tend to distribute themselves in different tiles as spatial hierarchies. it is more informative 
+# to look for maximal presence of features as opposed to average presence of features over small patches. Average will tend to dilute 
+# feature-presence information.
+
+# refer to notebook 5 for dog and cats example
+
+# Note: the dept of the feature maps progressively increases and the size progressively decreases
+
+### ---------- Data Pre-processing
+# (1) Read the Picture Files
+# (2) Decode the jpeg content to RGB grid of pixels
+# (3) Convert these into floating point tensors
+# (4) Rescale the pixel values which are between 0 and 255 to [0, 1] - as know that
+#    networks prefer to work on small values
+
+# generators which quickly set up Python Generators that can automatically turn Image Files on Disk to batches of pre-processed generators
+
+# ------------------------------------------------ refer to python code: python notebook 5 -------------------------------------------
+
+#history = model.fit_generator(
+#    train_generator,
+#    steps_per_epoch=100,
+#    epochs=30,
+#    validation_data=validation_generator,
+#    validation_steps=50)
+
+# ------ Using Generators for the purpose of training a model
+# we should have another method, in case of keras we have the model.fit_generator() method. In this method we can pass the validation data
+# using the validation generator. validation steps tells you how many batches you have to draw from the validation data for evaluation.
+# also we have steps_per_epoch, this is necessary because since we are passing in a generator it endlessly convert images to arrays. Since
+# we have decided to take a batch of size 20, we have 2000 samples(dogs + cats) hence the number of steps per epoch will be 2000/20 = 100
+
+# it is a good practice to save your model after training
+
+# the plots are characteristic of overfitting. The Training Accuray increases
+# linearly over time, until it reaches 100%, whereas Validation Accuracy stalls at
+# ~.7. Validation Loss minimizes after 5 pochs
+
+# data augmentation as a means of creating more images --- how does it create new data when CNN is translation invariant
+
+# broadly used augmentation methods:
+# (1) rotation_range is a value in degrees(0-180), a range within which to randomly rotate pics
+# (2) width_shift and height_shift are ranges(as a fraction of the total width or height) within which to randomly translate pictures 
+#    horizontally or vertically
+# (3) shear_range is for randomly applying shearing transformation
+# (4) zoom_range is for randomly zooming inside pictures
+# (5) horizontal_flip is for randomly flipping half the images horizontally - relevant when there are no assumptions on horizontal symmetry
+#    (for example real-world pictures)
+# (6) fill_mode is a strategy used for filling in newly created pixels, which can appear after rotation or width/height shift
+
+# if you are low on samples you will face the problem of overfitting
+# To tackle this you will need to use Data Augmentation. But Image Augmentation, means some of the images will be highly correlated to one 
+# another. When you do data augmentation the Network during training, never gets to see the same image twice. 
+# Also the data augmentation happens randomly, so if you have 3000 samples, then applying one augmentation does not lead to 6000 samples
+
+# -------------- Using a Pre-trained Model
+# If the original data set is large enough and general enough then the SPATIAL HIERARCHY OF FEATURES LEARNT BY THE PRE-TRAINED NETWORK 
+# acts as a generic model of the visual world.
+# 2 ways to use a Pre-trained Network:
+#		(1) Feature Extraction: the part of using the Conv. Base of the Pre-trained Network
+#		(2) Fine-Tuning: Fine Tuning involves unfreezing few of the top layers of the model and jointly training these layers
+#		    and the newly added layer - the dense and the fully connected layer. This is called fine-tuning because it slightly 
+#		    the more abstract representation of the model being reused in order to make them more relevant at hand.  
+
+# ------------------------------ Feature Extraction --------------------
+# Why do we use only the Convolutional Base and not the Dense layer of a Pre-trained model?
+# Because the information in the Convolutional Base is generic in nature. Feature Maps of a convnet are the presence maps of generic concepts 
+# over an picture. These are likely to be useful regardless of the CV problem that we are solving.
+# On the otherhand the representations learnt by the Classifier are likely to be specific to the set of classes on which the model was trained
+# They will only contain the presence probability of this or that class in the ENTIRE picture. Addionally the information contained in the
+# Densely connected layer does not contain anything on where the object is. These layers are rid of the notion of space. 
+# FOR PROBLEMS WHERE OBJECT LOCATION MATTERS DENSELY CONNECTED LAYER IS MORE OR LESS USELESS. 
+
+# ---------------- Feature Extraction & the spatial hierarchy of visual world
+# the initial layers captures/ extracts more local for example, visual edges, colors, textures. the later layers extracts more-abstract 
+# concepts such as dogs ears, cats ears. 
+# hence when you do Fine-tuning, you first freeze the conv net. Then you start with the last or the top layers unfreezing them. 
+# This makes total sense.
+
+#from keras.applications import VGG16
+#conv_base = VGG16(weights='imagenet',
+#include_top=False,
+#input_shape=(150, 150, 3))
+#
+#conv_base.summary()
+
+# final feature map as you will see has shape (4,4,512). That's the feature on top of which you will stick a densely connected classifier.
+# -------------- 2 ways to proceed with Transfer Learning
+# (1) Running the convolutional base on your dataset, recording it's output to a numpy array on disk. Then using this data as an input to 
+#     a standalone, densely connected classifier. This solution is fast and cheap and requires only running the convolutional base once for
+#     every input image, and the convolutional base is by far the most expensive part of the pipeline. But for the same reason this 
+#     technique will not let you to use data augmentation
+# (2) Extending the model you have(conv_base) by adding dense layerson top and running the whole thing end to end on the input data. and 
+# running the whole thing end to end on the input data. This will allow you to use data augmentation because every input image goes through 
+# the convolutional base everytime it is seen by the model. But for the same reason this technique is far more expensive than the first.
+
+# ------------ technique to extract features by running the data through the CNN base --- refer to python Notebook 5
+
+# Transfer Learning --- 3 different ways to do this
+#	(1) Extract Features using VGG16 and then train them using a Dense Layer model. Number of trainable parameters will be less. this 
+#           will be equal to the number of trainable parameters of the Dense layer only
+#	(2) Have greater number of trainable parameters. cnvnet number of features + dense number of features. But we need to freeze 
+#           the conv layers first. Or as you can remember top layers first - the ones which capture ears, eyes etc.
+#	(3) Third most expensive method is to deal with only the architecture first. Running the Convnet and the Dense layer end to end.
+#	    Here is where you can use Data Augmentation.
+
+
+# ------------------------------ Feature Tuning --------------------
+# Steps for fine tuning are:
+# (1) Add your custom network on top of the already trained network
+# (2) Freeze the base network
+# (3) Train the part you added
+# (4) Unfreeze some part of the base network
+# (5) Jointly train both these parts and the part you added.
+
+# ----------- argument for Freezing the top layers
+# Because the Dense layers are randomly initialized, very large weights will be passed on to the conv layers consequently unlearning
+# what ever it had learned before.
+
+# ----- Pre-trained Network should we use the entire convolutional base
+# if your training data is vastly different from that of the Pre-trained model then we can be better off using the first few conv. layers
+# 
+
+# -------------------- Visualizing what convnets learn
+# (1) Visualizing Intermediate Convnet Outputs: useful for understanding how successive convnet layers transform their input, and getting a 
+#     first idea on the meaning of the individual filters
+# (2) Visualizing Convnet Filters: useful for understanding precisely what visual pattern or concept each filter in the convnet is 
+#     receptive to
+# (3) Visualizing Heatmaps of Class Activations in an Image: Useful for understanding which part of an image were identified as belonging to 
+#     a particular class, thus allowing you to localize objects in images. These are called Class Activation Map
+
+# ----------------- Visualizing what convnets/ Layers learn --- HOW THE LAYERS WORK
+# (1) The first layer acts as a collection of various edge detectors. At that stage the activation retain almost all of the information 
+#     present in the initial picture
+# (2) As we go higher the activations become increasingly abstract and less visually interpretable. They begin to encode higher level 
+#     concepts such as "cat ear" and "cat eye". Higher presentation contain increasingly less info. about the visual contents of the image,
+#     and increasingly more info. related to the class of the image
+# (3) Sparcity of the activations increases with the dept of the layer: in the first layer all filters are activated by the input image;
+#     but in the subsequent layers more and more filters become blank. This means the pattern encoded by the filters are no longer found 
+#     in the input image.
+
+# ------------------ Visualizing what kind of Images are best for Filters
+# (1) Make a loss function. It can be the mean of all the pixels of the feature map after layer activation
+# (2) After calculating loss on all the pixels of the image apply gradient descent on the all of the pixels
+# (3) Update the values of the pixels. Run it for say 40 iterations to create the final image
+# (4) The resultant picture can be polka dot, edges
+# (5) This means that the Filter is very capable of extracting Polka dot feature maps from any images.
+
+
+# This is called mimicking the real world scenario where you are sort of abstract everything that you see into broader and blurred out 
+# abstractation.
+
+# Testing out what a CNN model is particularly good for:
+# (1) The filters from the first layer in the model encode simple directional edges and colors
+# (2) The filters from the second layer encode simple textures made from the combination of Edges and colors
+# (3) The filters in the higher layers begin to resemble textures found in natural images: feathers, eyes, leaves and so on
+
+# "Activation" is means the output from a layer. The result of running a Tensor through a layer in the model.
+
+# from a transfer model's layers all we can extract from the layers is semi-empty frames of Tensors. Once we pass a picture 
+# we these semi-empty Tensors become complete.
+
+# ----- Visualizing Heat maps of Class Activations --- finding out what is it exactly that is the distinguishing factor among images
+# Identifying the parts of the image which led to the classification of the image.
+# CLASS ACTIVATION MAP
+# Grad CAM: Visual Explanations from Deep Networks via Gradient-based Localization
+# Take the output feature map. Weight every channel of the Feature Map by the Gradient of the Class wrt the channel.
+# Essentailly: (how intensely the input image activates different class of the image)/(how intensely the input image activates the class)
+# resulting in how intensely the input image activates a class
+
+# code wise: how do we do it
+# (1) use the model to predict an image 
+# (2) find out np.argmin(preds[0])
+# (3) african_elephant_output = model.output[:, 297]
+#     last_conv_layer = model.get_layer('block5_conv3')
+
+
+# differential learning rates
+
+# how do you relate the generalization, large data and outliers?
+# So if you have a classification problem. And you have a lot of data. 
+# Problem 1: you fit a logistic regression model it turns out to be not that good. 
+# What are you going to do? 
+# so it's just about letting the output as it is or there is something else: classification versus regression problem
+# how do you relate DT data versus more data in a 
+# find out loss in each layer
+# fine tune the loss for particular 
+# paper HED
+# 10 neuron last layer --- does all the outputs adds up to 1
+
+# MAE and MSE
+
+
+
+
+
+
+
+
+
+
+

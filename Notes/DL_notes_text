@@ -1,0 +1,270 @@
+
+# Text are sequential in nature. Text which means words(they can be bigrams, trigrams etc) or characters are converted to Tensors
+# 2 ways of representing sentences into tensors:
+#	(1) One hot encoding
+#	(2) Word Embeddings
+
+# Difference between "One hot encoding" and "Word Embeddings": 
+# "One hot encoding" are meant to be sparse. They contain the information but the information is stored in many dimentions
+# "Word/ token Embeddings" on the other hand are dense. They squeeze a lot of information in fewer dimentions.
+
+# --- how to do One hot encoding?
+# (1) Take the set of all words in the corpus
+# (2) assign an index to each of the words in the dictionary
+# (3) convert each word into a vector of size N(vocalbulary size) with 1. at the index of the word.
+
+# a word on the Tensor representation of Input:
+# for samples = ["The cat sat on the mat.","The dog ate my homework."], This will be converted into a tensor of shape(2, max_length, vocab_size)
+# so the examples are "always on rows" while the dimention or features are always in columns
+
+
+# Word Embeddings - 2 ways to obtain word embeddings
+# (1) Learn word vectors jointly with the main task that you care about. In this set up you start with random word vectors and then learn
+#     the word vectors in the same way you learn the weights of a NN
+# (2) Pretrained Word embeddings: load into your model words embeddings which were calculated/ precomputed using a different ML task than 
+#     the one you are trying to solve.
+
+# Word Embeddings - how it works
+# "king" vector + "gender" vector = "queen" vector. "man" vector + "plural" vector = "men"
+# similarly "dog" vector and "wolf" vector will be close as will "cat" vector and "tiger" vector.
+
+# Word Embeddings - can be different based on the problem
+# the perfect word embedding for English-Language movie review can be different for perfect word embedding for English Language 
+# Legal Document Classification because the importance of certain semantic relationships varies from task to task.
+# thus it is reasonable to learn a new embedding space with every new task.
+
+# Wording Embeddings --- how to derive them
+# it's about learning the weights of the layer: that is the embedding layer
+
+# Word Embeddings --- is a dictionary that maps every word(identified as an index) to a dense vector
+
+# Word Embeddings --- the Input and Output of Word Embeddings
+
+# Input: 2D tensor of Integers of shape (samples, sequence_length). Returns corresponding list of dense vectors whose len will be #samples	
+# all sequences in a batch must be of the same length because you will need to pack them in a single tensor. So the sequences which are 
+# shorter in length should be padded with zero and sequences which are longer have to be snipped.
+# For Snipping the ideal strategy will be to take our vocabulary consisting of only the top 10,000 words.
+
+# Output: will be a 3D tensor of shape (samples, sequence_length, embedding_dimentionality)
+
+# Word Embeddings --- use in other models
+# the 3D tensor derived above (whilst maintaining the sequence) can be used in an RNN or 1D convolution layer.
+
+# Word Embeddings are nothing but weights. It is calculated as follows:
+# Look up embeddings for inputs.
+#    with tf.name_scope('embeddings'):
+#      embeddings = tf.Variable(
+#          tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0))
+#embed = tf.nn.embedding_lookup(embeddings, train_inputs)
+
+# So my understanding of how we derive an embedding of words for a certain corpus and a certain problem is we make a dense layer with 
+# 300 nodes(if thats the dimentionality that you are going after):
+# (1) Each of the 10,000 (the top most frequent words in the corpus) will be assigned an integer index
+# (2) these integer indexes will be assigned with random weights. In the above we assign: 
+#			tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0)) 
+# (3) Since the dimention = 300, there will be a dense layer with 300 nodes
+# (5) Solving the classification problem and using back propagation
+
+# Flatten and Dense are two different things
+
+# Embelling Layer model: we can create a model simply by:
+# 	(1) Creating Layer
+#	(2) flattening layer
+#	(3) Dense Layer
+
+# remember in the creation of DL for Text problems, it is imperative to transform words to tensors and vectors. The way we do this is as    
+# follows:-
+#	(1) create a dictionary
+#	(2) get the unique words in your corpus
+#	(3) assign indices to each of them
+# 	(4) find the max 10000 words
+#	(5) pad the documents in your corpus
+
+# Wrapping up 
+
+# Here is how we create the embedding matrix for 
+# (1) Let's say you have a corpus which are mapped to a target feature which takes the values 0 or 1
+# (2) what you do is find your vocabulary size let's say that is 10,000 and number of dimention is 10
+# (3) create a matrix of dimention (10000,10). randomly initialize the weights
+# (4)  
+# --------------- all of the above in python notebook 8
+
+# starting with RCNN now
+# RNN works a sequence by iterating through the sequence elements and maintaining a state containing information RELATIVE TO WHAT
+# IT HAS SEEN SO FAR.
+
+# RNN are characterized by their step function:
+# output_t = np.tanh(np.dot(W, input_t) + np.dot(U, state_t) + b)
+# the output of a RNN is a 2D tensor of dimention: time_steps*output_features
+
+# most of the frameworks on RNN takes inputs in (batch_size, time_steps, input_features) rather than (time_steps, input_features)
+# SimpleRNN can run in 2 different modes:
+# --- (1) it can return full sequences of successive outputs for each time step i.e. (batch_size, timesteps, output_features)
+# --- (2) only the last output for each input sequence (batch_size, output_features)
+
+# --- here is a typical RNN code
+# model.add(Embedding(10000, 32))
+# model.add(SimpleRNN(32))
+# In the second step is does not necessarily mean that you have to put 32, it can be 1, it can be 32, it can be 64 etc. etc.
+
+# --- now what is important to remember is that --- the snake theory
+# RNN creates nothing but sequence of information not one dimentional but many dimentional. these sequences are attending to get one information
+# each time the sequential nature of the sequence gets more evident(remember the:output_t = np.tanh(np.dot(W, input_t) + np.dot(U, state_t) + b)
+# these sequences then get fed into the parallel or sequential nodes
+
+# --- tried fitting a simpleRNN model to imdb data which has positive or negative sentiment
+# what happened???
+# after epoch 2 the model was probably overfitting as clearly seen from the Training and Validation loss and accuracy
+# also the simpleRNN although simple and hence did not quite have the problem of Vanishing Gradient had a major flaw
+# the max_len was 500 words which may not prove to be sufficient enough information for the model to process
+# the maximum validation accuracy was ~.89
+
+# the above 2 modes are controlled by return_sequence constructor
+
+
+
+# --- seq2seq models
+# Machine Translation: seq2seq without Attention
+# the entire sentence is fed into a block of Encoder and Decoder. The entire sentence is fed into the encoder. get processed into 
+# output plus state - time wise.
+# the final output comes out to the Encoder as one big mass. the first decoder get the signal you get the first translated word.
+# we are now in the second time step of decoder, we get the second word of the translation etc.
+# example of the model 
+# [Encoder RNN] -> [Encoder RNN] -> [Encoder RNN] ==> Hidden state ==> [decoder RNN] -> [decoder RNN] -> [decoder RNN]
+#     t0 entry	      t1 entry		t2 entry			 t0 outcome	   t1 outcome	   t2 outcome
+
+# LSTM are variant of the simple RNN in the sense is there is mechanism to carry information across the time steps
+# since there is no priortization of information for simple RNN we are faced with the vanishing gradient problem in simple RNN
+# Imagine LSTM, imagine conveyor belt carrying information, running parallel to the sequence you are processing
+# Information from a step can jump off intact when you need it
+# This is what LSTM does: it saves information for later thus preventing older information from dying out
+
+# remember how you deal with this: you intend to change the state as well as the input so we have:
+# y = activation(dot(state_t, U) + dot(input_t, W) + b)
+# wonder why bias is independent of weights ???
+
+# pseudo code for LSTM architecture:
+# output_t = activation(dot(state_t, Uo) + dot(input_t, Wo) + dot(C_t, Vo) + bo)
+# i_t = activation(dot(state_t, Ui) + dot(input_t, Wi) + bi)
+# f_t = activation(dot(state_t, Uf) + dot(input_t, Wf) + bf)
+# k_t = activation(dot(state_t, Uk) + dot(input_t, Wk) + bk)
+
+# to obtain the new carry state we combine i_t, f_t and k_t
+# c_t+1 = i_t * k_t + c_t * f_t
+
+# philosophical interpretation:
+# multiply c_t and f_t is a way to deliberately forget irrelevant information from the dataflow
+# i_t and k_t provide information about the present updating the carry track with new information
+
+# just remember what LSTM does: allows past information to be reinjected at a later time, thus fighting the vanishing gradient problem
+# --------- Hyperparameter tuning for LSTM
+# (1) Embeddings Dimentionality
+# (2) LSTM output Dimentionality
+# (3) Regularization
+
+# Cases where LSTM is particularly well suited:
+# (1) Question Answering 
+# (2) Machine Translation
+
+# --- tried fitting a single LSTM layer (32) to the imdb data. Here are the results and inferences
+# performance slightly better than simpleRNN. max_features/ time_steps being the same = 500
+# Performance could have been bettered by:
+# changing the dimention of the Embedding Matrix
+# changing the number of LSTM units
+# regularization 
+# sentiment analysis is not quite the typical LSTM problem(idea for a blog here)
+# Analyzing Global Long Term Structure of the reviews is something LSTM is good at. Bag of words approach is typically more 
+# well suited to this problem. Refer to the Feature creation in the Toxic Comment Problem.
+
+# --- advanced use of recurrent neural networks
+# the trade off between computational expensiveness and representational power is seen everywhere in ML
+
+# --- Proper way of using drop out in RNN
+# the same dropout mask (the same pattern of dropped units) should be applied at every time-
+# step, instead of a dropout mask that varies randomly from timestep to timestep.
+# What’s more, in order to regularize the representations formed by the recurrent gates
+# of layers such as GRU and LSTM , a temporally constant dropout mask should be applied
+# to the inner recurrent activations of the layer (a recurrent dropout mask).
+
+# --- also on drop out for RNN
+# there are 2 kinds of drop out:
+# ------ drop out: drop out for input units of the layer
+# ------ recurrent_dropout: specifying the drop out rate for recurrent units
+
+# let's apply drop out to the GRU and see how it impacts overfitting:
+# 
+
+# Using the same dropout mask at every timestep allows the network to properly propagate its
+# learning error through time; a temporally random dropout mask would disrupt this
+# error signal and be harmful to the learning process.
+
+# --- using drop out	
+# does drop out really help in imporving accuracy ?
+# yeah it does. Consider a scenario where your model is overfitting after the 2nd epoch. you might want to increase your epoch and add 
+# drop out or regulaization. Although the former is a more appropriate method.
+
+# --- stacking layers of RNN's
+# the Google translate have 7 layers of LSTM's stacked on top of one another
+# to stack recurrent layers in Keras, all intermediate layers should return their full sequence of outputs rather than output at the last
+# time step. This is done by specifying return_sequence = True
+
+# --- bidirectional
+# this is just an ensemble of chronological and anti chronological --- very important
+# idea is process newer time steps first
+# the reverse order RNN will lead to different representation of the data.
+# In ML it is always good to look at different representations of the data.
+
+# hyperparameter tuning and ways to imrpove your Recurrent/RNN model:
+# (1) adjust the number of units in each recurrent layer in the stacked up set up. Current choices may be sub optimal
+# (2) adjust the learning rate in the RMSprop Optimizer
+# (3) try using LSTM layers rather than GRU layers
+# (4) try using a bigger dense layer or bigger stack of dense layers
+# (5) use drop out with recurrent networks i.e. time constrained dropout mask(dropout) and recurrent dropout(which acts on layer to layer)
+#     The later is the recurrent_dropout option/ argument in case of Keras
+# (6) Run the best model on the test set. Otherwise you will end up with architectures which are overly fitting in the Validation set.
+
+# ------- Comparison on problems handled by Stacked Recurrent Networks and Bi-directional Networks
+# Stacked RNN have more representional power. They are applicable to problems which needs more of determining the overall global structure
+# such as Machine Translation. Bidirectional RNN's are useful in Natural Language Processing Problems. They are not strong performers on 
+# sequence data where the recent past is more important than the first point.
+
+# --------- Sequence Processing using CONVNETS
+# 1D convnets typically used with dilated kernels have been used with greater success for Audio Generation and Machine Translation.
+# they are computationally less expensive as compared to the RNN's
+
+# --- what is global maxpooling
+# Global max pooling = ordinary max pooling layer with pool size equals to the size of the input (minus filter size + 1, to be precise). 
+# You can see that MaxPooling1D takes a pool_length argument, whereas GlobalMaxPooling1D does not.
+
+# ------- using 1D conv for sequence problems
+# stacks of conv1D layers and Maxpooling layers. Eventaully putting a global maxpooling layer or flatten layer
+# also remember to add the following lines at the end of your model:
+# model.add(layers.GlobalMaxPooling1D())
+# model.add(layers.Dense(1))
+
+# --- when to use RNN's and when to avoid
+# (1) Use RNN when the global order matters. As is the case of time series data
+# (2) You can avoid using RNN's when global order does not matter. For example, use of a certain keyword at the beginning or end
+#     of a sentence determines the Sentiment regardless of the placement.
+
+# --- a note on generalizations --- figure a way out --- learn less to know more
+# compare CNN with LSTM's
+# (1) In CNN the weights are multiplied to each pixels. So also in LSTM's the weights are multiplied to each cell in the Matrix
+
+
+
+
+
+
+	
+
+
+
+
+
+
+ 
+
+
+
+ 
